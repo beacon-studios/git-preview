@@ -1,0 +1,46 @@
+html {
+  font-family: "Open Sans", sans-serif;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  background: #111;
+}
+
+.tab {
+  display: block;
+  border: none;
+  margin: 0;
+  text-decoration: none;
+  color: #ddd;
+  background: #111;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+}
+
+.tab[data-active] {
+  background: #333;
+  color: #fff;
+}
+
+.panel {
+  display: none;
+}
+
+.panel[data-active] {
+  display: block;
+  padding: 0.75rem;
+  background: #333;
+}
+
+.panel pre {
+  margin: 0;
+  padding: 0;
+}

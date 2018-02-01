@@ -1,0 +1,14 @@
+extends _layout.pug
+
+block content
+  .tabs
+    - for(const file of files)
+      button.tab(data-id=file.id data-active=file.id === active)= file.path
+  .panels
+    - for(const file of files)
+      div.panel(data-id=file.id data-active=file.id === active)
+        pre
+          code(class=file.changed ? 'diff' : 'javascript')= file.contents
+
+
+  script(src="/assets/app.js")
