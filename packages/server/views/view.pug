@@ -1,5 +1,23 @@
 extends _layout.pug
 
 block content
-  #app
-  script(type='application/json')= JSON.stringify(settings)
+  .tabs
+    - for(const file of files)
+      button.tab(data-id=file.id data-active=file.id === active)= file.path
+  .panels
+    - for(const file of files)
+      div.panel(data-id=file.id data-active=file.id === active)
+        pre
+          code(class='javascript')= file.contents
+  .source
+    .repo
+      | viewing
+      |
+      a.repo-link(href=url target="_blank")
+        |#{user}/#{repo}
+        |#{root ? `/${root}` : ''}
+        |#{branch === 'master' ? '' : (`#${branch}`)}
+      |
+      | on GitHub
+
+  script(src="/assets/app.js")

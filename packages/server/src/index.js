@@ -12,7 +12,7 @@ app.use('/assets', express.static(path.join(__dirname, '../public')));
 
 app.use('/compare/:user/:repo/:from/:to', async (req, res) => {
   const {user, repo, from, to} = req.params;
-  const root = 'root' in req.query ? (req.query.root + '/') : '';
+  const root = 'root' in req.query ? (req.query.root) : '';
 
   const github = GitHub(user, repo, process.env.GITHUB_TOKEN);
 
@@ -21,7 +21,7 @@ app.use('/compare/:user/:repo/:from/:to', async (req, res) => {
     return;
   }
 
-  const paths = req.query.files.map(file => `${root}${file}`);
+  const paths = req.query.files.map(file => `${root}/${file}`);
 
   try {
     const requests = [
@@ -68,7 +68,7 @@ app.use('/compare/:user/:repo/:from/:to', async (req, res) => {
       } else {
         indexedFiles[file.path] = {
           id: shortid.generate(),
-          path: file.path.slice(root.length),
+          path: file.path.slice(root.length + 1),
           contents,
           changed: false,
         };
@@ -79,7 +79,10 @@ app.use('/compare/:user/:repo/:from/:to', async (req, res) => {
     const active = flatFiles[0].id;
 
     res.render('compare', {
-      root,
+      user,
+      repo,
+      from,
+      to,
       active,
       files: flatFiles,
     });
@@ -92,7 +95,7 @@ app.use('/compare/:user/:repo/:from/:to', async (req, res) => {
 
 app.use('/view/:user/:repo/:branch?', async (req, res) => {
   const {user, repo, branch = 'master'} = req.params;
-  const root = 'root' in req.query ? (req.query.root + '/') : '';
+  const root = 'root' in req.query ? (req.query.root) : '';
 
   const github = GitHub(user, repo, process.env.GITHUB_TOKEN);
 
@@ -101,12 +104,28 @@ app.use('/view/:user/:repo/:branch?', async (req, res) => {
     return;
   }
 
-  const paths = req.query.files.map(file => `${root}${file}`);
+  const paths = req.query.files.map(file => `${root}/${file}`);
   const requests = paths.map(path => github.getContents(path, branch));
 
   try {
     const files = await Promise.all(requests);
-    res.render('view', {settings: {root, files}});
+    const url = `https://github.com/${user}/${repo}/tree/${branch}/${root}`;
+
+    const flatFiles = files.map(file => ({
+      id: shortid.generate(),
+      path: file.path.slice(root.length + 1),
+      contents: Buffer.from(file.content, 'base64'),
+    }));
+
+    res.render('view', {
+      user,
+      repo,
+      branch,
+      root,
+      url,
+      active: flatFiles[0].id,
+      files: flatFiles,
+    });
 
   } catch(err) {
     console.log(err);

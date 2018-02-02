@@ -2,6 +2,9 @@
   "name": "preview-git-server",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
   "dependencies": {
     "dotenv": "^5.0.0",
     "express": "^4.16.2",
